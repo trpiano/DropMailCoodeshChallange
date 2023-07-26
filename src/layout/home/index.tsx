@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 
-import { Button, Skeleton } from "@mui/material";
+import { Button } from "@mui/material";
 
 import { RxCopy } from "react-icons/rx";
 import { MdRefresh } from "react-icons/md";
