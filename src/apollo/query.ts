@@ -34,6 +34,7 @@ export const VERIFY_SESSION = gql`
 export const GET_EMAILS = gql`
   query Email($sessionId: ID!) {
     session(id: $sessionId) {
+      expiresAt
       mails {
         rawSize
         fromAddr

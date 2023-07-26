@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, useState } from "react";
 
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -10,21 +10,35 @@ import {
 import { ButtonStyles, Container, TitleContainer } from "./styles";
 import { toast } from "react-toastify";
 
+function requestNotificationPermission(
+  setIsRequiringPermission: Dispatch<React.SetStateAction<boolean>>
+) {
+  setIsRequiringPermission(true);
+  window.Notification.requestPermission()
+    .then((permission) => {
+      if (permission === "granted") {
+        console.log("Notification accept");
+        toast.success("Notifications enabled successfully!");
+      } else {
+        toast.error("Notifications not enabled, please try again!");
+      }
+    })
+    .catch((error) => {
+      console.error("Error requesting notification permission:", error);
+      toast.error("An error occurred while requesting notification permission.");
+    })
+    .finally(() => {
+      setIsRequiringPermission(false);
+    });
+}
+
 export default function Header() {
   const [isRequiringPermission, setIsRequiringPermission] = useState(false);
 
   function handleActiveNotification() {
-    if (window.Notification.permission !== "granted")
-      setIsRequiringPermission(true);
-    window.Notification.requestPermission((permission) => {
-      if (permission === "granted") {
-        console.log("Notification accept");
-        toast.success("Notificações habilitadas com sucesso!");
-        setIsRequiringPermission(false);
-      } else
-        toast.error("Notificações não habilitadas, tente novamente!"),
-          setIsRequiringPermission(false);
-    });
+    if (window.Notification.permission !== "granted") {
+      requestNotificationPermission(setIsRequiringPermission);
+    }
   }
 
   return (
@@ -37,12 +51,11 @@ export default function Header() {
         style={ButtonStyles}
         variant="outlined"
         size="medium"
-        startIcon={<MdOutlineNotificationsActive />}
         onClick={handleActiveNotification}
         loading={isRequiringPermission}
-        loadingPosition="start"
       >
-        Receber Notificações
+        <MdOutlineNotificationsActive />
+        <span className="buttonText">Enable Notifications</span>
       </LoadingButton>
     </Container>
   );

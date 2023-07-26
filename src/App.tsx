@@ -7,9 +7,7 @@ import { HomeLayout } from './layout/home'
 import GlobalStyles from "./styles/global";
 
 function App() {
-  // const urlAPI = import.meta.env.DROPMAIL_API_URL;
-
-  const urlAPI = `https://cors-anywhere.herokuapp.com/https://dropmail.me/api/graphql/12345asdasd12`
+  const urlAPI = import.meta.env.VITE_DROPMAIL_API_URL;
 
   const client = new ApolloClient({
     uri: urlAPI,

@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
-import { Divider } from "@mui/material";
-
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { Divider, Skeleton } from "@mui/material";
 
 import { sessionType } from "../../constants/session";
 import { Mail, mailData } from "../../constants/email";
@@ -19,23 +17,38 @@ import {
   MessagesList,
 } from "./styles";
 
+interface inboxProps {
+  session: sessionType | undefined;
+  setSession: Dispatch<SetStateAction<sessionType | undefined>>;
+}
 
-export default function Inbox() {
-  const [selectEmailToRead, setSelectEmailToRead] = useState<mailData>({
-    rawSize: 100,
-    fromAddr: "",
-    toAddr: "",
-    downloadUrl: "",
-    text: "",
-    headerSubject: "",
-  });
-  const [session, setSession] = useLocalStorage<sessionType | undefined>(
-    "session",
-    undefined
+function renderSkeletonRows(numRows: number, height: number) {
+  const skeletonRows = [];
+  for (let i = 0; i < numRows; i++) {
+    skeletonRows.push(
+      <Skeleton
+        key={i}
+        sx={{ bgcolor: "#666666", margin: "0 0 0.25rem 0" }}
+        animation="wave"
+        variant="rounded"
+        height={height}
+      />
+    );
+  }
+  return skeletonRows;
+}
+
+export default function Inbox({ session, setSession }: inboxProps) {
+  const [selectEmailToRead, setSelectEmailToRead] = useState<mailData | null>(
+    null
   );
-  const id = session?.id;
-  const { data: emails, previousData } = useQuery<Mail>(GET_EMAILS, {
-    variables: { sessionId: id },
+
+  const {
+    data: emails,
+    previousData,
+    loading,
+  } = useQuery<Mail>(GET_EMAILS, {
+    variables: { sessionId: session?.id },
   });
 
   function handleSelectEmailToRead(index: number) {
@@ -44,26 +57,22 @@ export default function Inbox() {
 
   useEffect(() => {
     if (session && emails && emails.session) {
-      setSession(old => {
-        if (old) {
-          const newSession = { ...old, expiresAt: emails.session.expiresAt };
-          return newSession;
+      setSession((prevSession) => {
+        if (prevSession) {
+          return { ...prevSession, expiresAt: emails.session.expiresAt };
         }
+        return prevSession;
       });
+
       if (
         previousData &&
         JSON.stringify(previousData.session.mails) !==
           JSON.stringify(emails.session.mails)
       ) {
-        //TODO showNotification(title: "Novo email", )
-        new Notification("Novo email", {
-          body: "Você tem um novo email no seu inbox!"
-        });
+        showNotification("Novo email", "Você tem um novo email no seu inbox!");
       }
     }
   }, [emails]);
-
-  console.log(emails?.session.mails)
 
   return (
     <>
@@ -71,7 +80,8 @@ export default function Inbox() {
         <InboxMessagesContainer>
           <p>Inbox</p>
           <MessagesList>
-            {emails &&
+            {loading ? renderSkeletonRows(5, 70) : (
+              emails &&
               emails.session.mails.map(
                 ({ fromAddr, text, headerSubject }, index) => (
                   <Message
@@ -79,20 +89,21 @@ export default function Inbox() {
                     onClick={() => handleSelectEmailToRead(index)}
                   >
                     <h4>{fromAddr}</h4>
-                    <span>{text}</span>
-                    <p>{headerSubject}</p>
+                    <span>{headerSubject}</span>
+                    <p>{text}</p>
                   </Message>
                 )
-              )}
+              )
+            )}
           </MessagesList>
         </InboxMessagesContainer>
         <MessageContent>
           <div>
             <p>{selectEmailToRead?.fromAddr}</p>
             <Divider />
-            <h3>{selectEmailToRead.headerSubject}</h3>
+            <h3>{selectEmailToRead?.headerSubject}</h3>
           </div>
-          <p>{selectEmailToRead.text}</p>
+          <p>{selectEmailToRead?.text}</p>
         </MessageContent>
       </Container>
     </>

@@ -96,6 +96,15 @@ export const MessageContent = styled.div`
             width: 100%;
             min-width: 55px;
             font-size: 1.15rem;
+            padding: 0 0.5rem;
         }
+
+        h3{
+            padding: 0 0.5rem;
+        }
+    }
+
+    p:last-child{
+        padding: 0.5rem;
     }
 `

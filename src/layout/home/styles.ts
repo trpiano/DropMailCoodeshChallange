@@ -59,6 +59,37 @@ export const EmailContainer = styled.div`
             cursor: initial;
         }
     }
+
+    @media screen and (max-width: 768px) {
+        width: 80%;
+
+        div{
+            input{
+                min-width: 100%;
+            }
+            button{
+                padding: 0 3rem;
+            }
+        }
+    }
+
+    @media screen and (max-width: 550px) {
+        width: 70%;
+    }
+
+    @media screen and (max-width: 400px) {
+        width: 65%;
+
+        div{
+            input{
+                min-width: 100%;
+            }
+
+            button{
+                padding: 0 2.5rem;
+            }
+        }
+    }
 `
 
 export const RefreshContainer = styled.div`

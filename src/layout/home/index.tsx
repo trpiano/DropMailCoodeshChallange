@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 
-import { Button } from "@mui/material";
+import { Button, Skeleton } from "@mui/material";
 
 import { RxCopy } from "react-icons/rx";
 import { MdRefresh } from "react-icons/md";
@@ -32,7 +32,7 @@ export function HomeLayout() {
 
   const [
     generateSession,
-    // { loading: loadingQueryCreateSession }
+    { loading }
   ] = useMutation(GENERATE_SESSION);
   const { refetch: getEmails } = useQuery<Mail>(GET_EMAILS);
 
@@ -56,7 +56,7 @@ export function HomeLayout() {
 
   function copyEmailToClipboard() {
     session && navigator.clipboard.writeText(session.address);
-    toast.info("E-mail copiado para o clipboard!")
+    toast.info("Email copied to clipboard!")
   }
 
   //Effect responsável pelo contador do refresh
@@ -82,8 +82,6 @@ export function HomeLayout() {
     }
   }, [session]);
 
-  console.log(session);
-
   function renderCounter(){
     return <div>{counter}</div>;
   };
@@ -95,7 +93,7 @@ export function HomeLayout() {
         <EmailContainer>
           <span>Your temporary email address</span>
           <div>
-            <input type="text" defaultValue={session?.address} readOnly />
+            <input type="text" defaultValue={loading ? "Loading..." : session?.address} readOnly />
             <Button startIcon={<RxCopy />} onClick={copyEmailToClipboard}>
               Copy
             </Button>
@@ -119,11 +117,11 @@ export function HomeLayout() {
               {renderCounter}
             </CountdownCircleTimer>
           </div>
-          <Button startIcon={<MdRefresh />} onClick={refreshEmails}>
+          <Button startIcon={<MdRefresh />} onClick={() => refreshEmails()}>
             Refresh
           </Button>
         </RefreshContainer>
-        <Inbox />
+        <Inbox session={session} setSession={setSession} />
       </ContentContainer>
     </Container>
   );
