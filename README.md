@@ -30,6 +30,7 @@ This project aims through an interface to enable the use of temporary emails tha
 
 The following tools were used in this project:
 
+- [ReactJS](https://react.dev/)
 - [ViteJS](https://vitejs.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Styled-Components](https://styled-components.com/)
